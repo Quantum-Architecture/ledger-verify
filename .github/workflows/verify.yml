@@ -1,0 +1,26 @@
+name: verify
+
+on: [push, pull_request, workflow_dispatch]
+
+permissions:
+  contents: read
+
+jobs:
+  verifier:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.9", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Unit tests
+        run: python -m unittest -v test_ledger_verify
+      - name: Regenerate deterministic examples
+        run: python examples/make_examples.py
+      - name: Intact ledger must validate
+        run: python ledger_verify.py examples/intact.jsonl
+      - name: Tampered ledger must fail
+        run: "! python ledger_verify.py examples/tampered.jsonl"

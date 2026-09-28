@@ -1,34 +1,62 @@
 # ledger-verify
 
-A small, runnable public verification utility from Quantum Excellium.
+**Independent verification for hash-chained AI-agent audit ledgers.**
 
-It demonstrates a general principle used throughout governed systems: **an append-only record should make later alteration detectable**.
+This repository answers one public question:
 
-This repository is deliberately non-enabling. It does **not** publish proprietary QEC, BTT, patent, orchestration or cryptographic implementation details.
+> Has this JSONL audit ledger been altered after it was written?
 
-## Quick start
+It does **not** prove who produced an event, when it happened, or that the underlying action was correct.
 
-```powershell
-python .\ledger_verify.py .\examples\intact.jsonl
-python .\ledger_verify.py .\examples\tampered.jsonl
+## Published format
+
+Each line is one UTF-8 JSON object.
+
+- `prev_hash` — previous record hash.
+- `hash` — SHA-256 of the current canonical record.
+- Genesis `prev_hash` — exactly 64 zeroes.
+- Canonical JSON — keys sorted, separators `(",", ":")`, UTF-8 bytes.
+- `hash` itself is excluded from the hash calculation.
+
+## Expected behaviour
+
+```bash
+python ledger_verify.py examples/intact.jsonl
+# VALID ; exit 0
+
+python ledger_verify.py examples/tampered.jsonl
+# INVALID ; exit 1
 ```
 
-Expected output:
+## What this proves
 
-```text
-VALID
-INVALID
-```
+A `VALID` result means the chain is internally consistent under the published format.
 
-## Test
+## What it does not prove
 
-```powershell
-python -m pip install -r requirements-dev.txt
-python -m pytest -q
-```
+- signer identity;
+- trusted time;
+- external anchoring;
+- policy correctness;
+- physical execution of the logged action;
+- SOC 2 / ISO 27001 / regulatory certification.
 
-## Scope
+## Related public proof
 
-This demonstrator uses a simple SHA-256 hash chain. It is an educational/public verifier, not a legal timestamping service and not a substitute for a security audit.
+Governed-agent demo:
+https://github.com/Quantum-Architecture/qec-governed-agent-demo
 
-Website: https://quantumexcellium.com
+Proof page:
+https://quantumexcellium.com/en/proof.html
+
+## Security
+
+See `SECURITY.md`.
+
+## License
+
+Apache-2.0.
+
+
+## Format and tests
+Format specification: [FORMAT.md](FORMAT.md) · `python -m unittest -v test_ledger_verify` · CI regenerates the examples and requires `intact` to pass and `tampered` to fail.
