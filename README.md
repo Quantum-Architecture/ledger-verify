@@ -1,5 +1,7 @@
 # ledger-verify
 
+[![verify](https://github.com/Quantum-Architecture/ledger-verify/actions/workflows/verify.yml/badge.svg)](https://github.com/Quantum-Architecture/ledger-verify/actions/workflows/verify.yml)
+
 **Independent verification for hash-chained AI-agent audit ledgers.**
 
 This repository answers one public question:
